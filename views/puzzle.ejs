@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overflowing Palette</title>
+    <style>
+        body {
+            background: radial-gradient(circle, #1a1a1a, #000);
+            font-family: 'Segoe UI', sans-serif;
+            color: #ffd700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        #status {
+            margin-bottom: 10px;
+            font-size: 18px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #ffd70055;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(7, 40px);
+            gap: 4px;
+            background: rgba(255, 215, 0, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #ffd70033;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .blocker {
+            background: #111;
+            background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" fill="%23111"/><circle cx="20" cy="20" r="10" fill="%23222"/></svg>');
+            background-size: cover;
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .reset-btn {
+            padding: 8px 16px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            border: 2px solid #ffd70088;
+            display: none;
+            z-index: 999;
+        }
+
+        #helpBtn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: none;
+            color: #ffd700;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        #helpPopup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ffd70088;
+            width: 300px;
+            display: none;
+            z-index: 999;
+        }
+
+        #helpPopup h2 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+
+        #helpPopup button {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: #555;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="helpBtn">❓</button>
+
+    <h1>Overflowing Palette</h1>
+    <div id="status"></div>
+
+    <div class="controls">
+        <button class="color-btn" style="background:#d34d4d" onclick="selectColor('#d34d4d')"></button>
+        <button class="color-btn" style="background:#f2e46b" onclick="selectColor('#f2e46b')"></button>
+        <button class="color-btn" style="background:#4da6ff" onclick="selectColor('#4da6ff')"></button>
+        <button class="color-btn" style="background:#70e0c4" onclick="selectColor('#70e0c4')"></button>
+        <button class="reset-btn" onclick="resetLevel()">Restart</button>
+    </div>
+
+    <div id="grid"></div>
+
+    <div class="popup" id="popup"></div>
+
+    <div id="helpPopup">
+        <h2>Cara Bermain</h2>
+        <p>Tujuanmu adalah mengubah semua blok menjadi warna <strong>target</strong> (misalnya kuning) dalam jumlah
+            langkah yang tersedia.</p>
+        <ul>
+            <li>Pilih warna dengan tombol warna di atas grid.</li>
+            <li>Klik salah satu blok berwarna untuk memulai perubahan warna menyebar.</li>
+            <li>Warna akan menyebar ke blok berwarna sama yang terhubung.</li>
+            <li>Hindari blok penghalang (warna gelap).</li>
+        </ul>
+        <button onclick="closeHelp()">Tutup</button>
+    </div>
+
+    <script>
+        const levels = [{
+            grid: [
+                "yyyyyyyyyy",
+                "rrrbbggggr",
+                "bbgg##yygg",
+                "r##ggyy##y",
+                "yyrrgg##yy",
+                "bbyyrrgg##",
+                "yybbyyrryy"
+            ],
+            moves: 7,
+            goal: "#f2e46b"
+        }];
+
+        let currentLevel = 0;
+        let selectedColor = "#d34d4d";
+        let remainingMoves = levels[currentLevel].moves;
+        let gridState = [];
+
+        const gridEl = document.getElementById("grid");
+        const statusEl = document.getElementById("status");
+        const popupEl = document.getElementById("popup");
+        const helpBtn = document.getElementById("helpBtn");
+        const helpPopup = document.getElementById("helpPopup");
+
+        helpBtn.addEventListener("click", () => {
+            helpPopup.style.display = "block";
+        });
+
+        function closeHelp() {
+            helpPopup.style.display = "none";
+        }
+
+        function mapCharToColor(ch) {
+            switch (ch) {
+                case 'r': return "#d34d4d";
+                case 'y': return "#f2e46b";
+                case 'b': return "#4da6ff";
+                case 'g': return "#70e0c4";
+                default: return "#444";
+            }
+        }
+
+        function loadLevel(levelIndex) {
+            gridEl.innerHTML = "";
+            gridState = [];
+            remainingMoves = levels[levelIndex].moves;
+            statusEl.innerText = `Remaining Moves: ${remainingMoves} | Goal: YELLOW`;
+
+            levels[levelIndex].grid.forEach((rowStr, row) => {
+                const rowArr = [];
+                for (let col = 0; col < rowStr.length; col++) {
+                    const ch = rowStr[col];
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    if (ch === "#") {
+                        cell.classList.add("blocker");
+                        rowArr.push(null);
+                    } else {
+                        const color = mapCharToColor(ch);
+                        cell.style.backgroundColor = color;
+                        cell.dataset.color = color;
+                        cell.addEventListener("click", () => handleClick(row, col));
+                        rowArr.push(cell);
+                    }
+                    gridEl.appendChild(cell);
+                }
+                gridState.push(rowArr);
+            });
+        }
+
+        function selectColor(color) {
+            selectedColor = color;
+        }
+
+        function handleClick(row, col) {
+            const startCell = gridState[row][col];
+            if (!startCell || startCell.dataset.color === selectedColor || remainingMoves <= 0) return;
+
+            const originalColor = startCell.dataset.color;
+            const toVisit = [[row, col]];
+            const visited = new Set();
+            const cellsToChange = [];
+
+            while (toVisit.length) {
+                const [r, c] = toVisit.pop();
+                const key = `${r},${c}`;
+                if (visited.has(key)) continue;
+                visited.add(key);
+
+                const cell = gridState[r]?.[c];
+                if (!cell || cell.dataset.color !== originalColor) continue;
+
+                cellsToChange.push(cell);
+
+                [[0, 1], [1, 0], [0, -1], [-1, 0]].forEach(([dr, dc]) => {
+                    const nr = r + dr, nc = c + dc;
+                    if (gridState[nr]?.[nc]?.dataset.color === originalColor) {
+                        toVisit.push([nr, nc]);
+                    }
+                });
+            }
+
+            animateColorChain(cellsToChange, selectedColor, () => {
+                remainingMoves--;
+                statusEl.innerText = `Remaining Moves: ${remainingMoves} | Goal: YELLOW`;
+                checkWin();
+            });
+        }
+
+        function animateColorChain(cells, color, callback) {
+            cells.forEach((cell, index) => {
+                setTimeout(() => {
+                    cell.style.backgroundColor = color;
+                    cell.dataset.color = color;
+                    if (index === cells.length - 1 && callback) callback();
+                }, index * 80); // delay 80ms antar blok
+            });
+        }
+
+        function animateColorChange(cell, color) {
+            setTimeout(() => {
+                cell.style.backgroundColor = color;
+                cell.dataset.color = color;
+            }, 50);
+        }
+
+        function checkWin() {
+            let allSame = true;
+            for (let row of gridState) {
+                for (let cell of row) {
+                    if (cell && cell.dataset.color !== levels[currentLevel].goal) {
+                        allSame = false;
+                        break;
+                    }
+                }
+            }
+
+            if (allSame) {
+                popupEl.innerText = "🎉 You Win!";
+                popupEl.style.display = "block";
+            } else if (remainingMoves === 0) {
+                popupEl.innerText = "😢 You Lose!";
+                popupEl.style.display = "block";
+            }
+        }
+
+        function resetLevel() {
+            popupEl.style.display = "none";
+            helpPopup.style.display = "none";
+            loadLevel(currentLevel);
+        }
+
+        loadLevel(currentLevel);
+    </script>
+</body>
+
+</html>
