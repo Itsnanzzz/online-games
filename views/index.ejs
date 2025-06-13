@@ -1,17 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neon Game Landing</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: #111;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: #0f0;
+      text-shadow: 0 0 10px #0f0;
+    }
+
+    .menu {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .menu a {
+      color: #0f0;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .menu a:hover {
+      color: #fff;
+    }
+
+    .container {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header {
+      margin-top: 5rem;
+    }
+
+    .glow {
+      font-size: 3.5rem;
+      color: #0f0;
+      text-shadow: 0 0 4px #0f0, 0 0 8px #0f0;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .tagline {
+      margin: 1rem 0;
+      font-size: 1.2rem;
+      color: #ccc;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: #0f0;
+      border: 2px solid #0f0;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #0f0;
+      color: #000;
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    .features {
+      margin-top: 5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .card {
+      background: #1a1a1a;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 300px;
+      box-shadow: 0 0 10px #0f04;
+      border: 1px solid #0f03;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #0f0;
+    }
+
+    .top-games-section {
+      margin-top: 5rem;
+      text-align: left;
+      position: relative;
+    }
+
+    .top-games-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #0f0;
+    }
+
+    .top-games-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .top-games {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      flex: 1;
+      scrollbar-width: none;
+    }
+
+    .top-games::-webkit-scrollbar {
+      display: none;
+    }
+
+    .top-game-card {
+      flex: 0 0 auto;
+      background: #1a1a1a;
+      padding: 1rem;
+      border-radius: 12px;
+      width: 250px;
+      border: 1px solid #0f03;
+      box-shadow: 0 0 10px #0f04;
+      transition: transform 0.3s;
+      text-align: center;
+      scroll-snap-align: start;
+      cursor: pointer;
+    }
+
+    .top-game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    .top-game-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .top-game-card .btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      margin-top: 4rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-    <h1><%= message %></h1>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/puzzle">Puzzle</a>
-    </nav>
+  <nav>
+    <div class="logo">NEON</div>
+    <div class="menu">
+      <a href="/">Home</a>
+      <a href="/games">Play</a>
+      <a href="/about">About</a>
+    </div>
+  </nav>
+  <div class="container">
+    <header>
+      <h1 class="glow">NEON BATTLE</h1>
+      <p class="tagline">Enter the cyber arena and prove your skills!</p>
+      <a href="/games" class="btn">Play Now</a>
+    </header>
+    <section class="features">
+      <div class="card">
+        <h2>⚔️ Intense Fights</h2>
+        <p>Engage in real-time neon battles with players worldwide.</p>
+      </div>
+      <div class="card">
+        <h2>🧠 Smart AI</h2>
+        <p>Challenge yourself with adaptive AI opponents.</p>
+      </div>
+      <div class="card">
+        <h2>🎮 Easy Controls</h2>
+        <p>Master the game with intuitive, fluid controls.</p>
+      </div>
+    </section>
+    <section class="top-games-section">
+      <h2 class="top-games-title">🔥 Top Games</h2>
+      <div class="top-games-wrapper">
+        <div class="top-games" id="topGames">
+          <div class="top-game-card">
+            <h3>Overflowing Palette</h3>
+            <p>Solve the puzzle to save the world.</p>
+            <a href="/puzzle" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Cyber Arena</h3>
+            <p>Battle against other neon warriors in real time.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Glow Puzzle</h3>
+            <p>Test your logic in a mind-bending neon puzzle game.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Neon Defense</h3>
+            <p>Protect your base from waves of glowing enemies.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Neon Defense</h3>
+            <p>Protect your base from waves of glowing enemies.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Neon Defense</h3>
+            <p>Protect your base from waves of glowing enemies.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Neon Defense</h3>
+            <p>Protect your base from waves of glowing enemies.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+          <div class="top-game-card">
+            <h3>Neon Defense</h3>
+            <p>Protect your base from waves of glowing enemies.</p>
+            <a href="#" class="btn">Enter</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <p>&copy; 2025 NeonGame Studios</p>
+    </footer>
+  </div>
+  <script>
+    const topGames = document.getElementById('topGames');
+    let autoScroll;
+    let paused = false;
+
+    function startAutoScroll() {
+      autoScroll = setInterval(() => {
+        if (!paused) {
+          topGames.scrollBy({ left: 1, behavior: 'smooth' });
+          if (topGames.scrollLeft + topGames.clientWidth >= topGames.scrollWidth - 1) {
+            topGames.scrollTo({ left: 0, behavior: 'smooth' });
+          }
+        }
+      }, 30);
+    }
+
+    topGames.addEventListener('mouseover', () => paused = true);
+    topGames.addEventListener('mouseout', () => paused = false);
+    topGames.addEventListener('click', () => {
+      paused = true;
+      clearInterval(autoScroll);
+      setTimeout(() => {
+        paused = false;
+        startAutoScroll();
+      }, 7000);
+    });
+
+    startAutoScroll();
+  </script>
 </body>
-</html> 
+</html>
