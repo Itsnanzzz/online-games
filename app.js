@@ -13,15 +13,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home Page', message: 'Welcome to the Multi-Page Express App!' });
+    res.render('index');
+});
+
+app.get('/games', (req, res) => {
+    res.render('games');
 });
 
 app.get('/about', (req, res) => {
-    res.render('about', { title: 'About Us', message: 'Learn more about us here.' });
+    res.render('about');
 });
 
 app.get('/puzzle', (req, res) => {
-    res.render('puzzle');
+    res.render('games/puzzle');
 });
 
 app.listen(port, () => {
