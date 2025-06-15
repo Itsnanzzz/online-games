@@ -28,6 +28,10 @@ app.get('/puzzle', (req, res) => {
     res.render('games/puzzle');
 });
 
+app.get('/clm', (req, res) => {
+    res.render('games/color-match');
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 }); 
