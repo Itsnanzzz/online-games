@@ -99,6 +99,8 @@
             border: 2px solid #ffd70088;
             display: none;
             z-index: 999;
+            text-align: center;
+            font-size: 24px;
         }
 
         #helpBtn {
@@ -141,6 +143,79 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 6vw;
+                text-align: center;
+            }
+
+            #status {
+                font-size: 4vw;
+                padding: 4px 8px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4vw;
+            }
+
+            .color-btn {
+                width: 12vw;
+                height: 12vw;
+                box-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+            }
+
+            .reset-btn {
+                font-size: 4vw;
+                padding: 2vw 4vw;
+                height: auto;
+                width: auto;
+            }
+
+            #grid {
+                grid-template-columns: repeat(10, 8vw);
+                grid-template-rows: repeat(7, 8vw);
+                gap: 2vw;
+                padding: 2vw;
+            }
+
+            .cell {
+                width: 8vw;
+                height: 8vw;
+                border-radius: 1vw;
+            }
+
+            #helpBtn {
+                font-size: 6vw;
+                top: 8px;
+                right: 8px;
+            }
+
+            #helpPopup {
+                width: 90vw;
+                padding: 5vw;
+                font-size: 4vw;
+            }
+
+            #helpPopup h2 {
+                font-size: 5vw;
+            }
+
+            #helpPopup button {
+                font-size: 4vw;
+                padding: 3vw 5vw;
+            }
+
+            .popup {
+                font-size: 5vw;
+                padding: 5vw;
+                max-width: 90vw;
+                text-align: center;
+            }
         }
     </style>
 </head>

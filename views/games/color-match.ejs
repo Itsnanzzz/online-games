@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Match Puzzle</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+
+        h1 {
+            color: #4ecca3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: clamp(20px, 4vw, 28px);
+            text-align: center;
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+
+        #game-container {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: min(85vw, 280px);
+            margin: 0 auto;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .card {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #232931;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: min(4.5vw, 20px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        #timer, #score {
+            font-size: min(3.5vw, 16px);
+            text-align: center;
+            margin: 6px 0;
+        }
+
+        #timer {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        #score {
+            color: #4ecca3;
+        }
+
+        #startBtn, #restart {
+            background: #4ecca3;
+            color: #232931;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: min(3.2vw, 15px);
+            margin: 8px auto;
+            display: block;
+            width: fit-content;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #startBtn:hover, #restart:hover {
+            background: #45b392;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #startBtn:active, #restart:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #startBtn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .game-started .card {
+            pointer-events: auto;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            width: min(90vw, 280px);
+        }
+
+        .game-over h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: min(4vw, 20px);
+        }
+
+        .game-over p {
+            font-size: min(3.5vw, 16px);
+            margin-bottom: 15px;
+        }
+
+        .game-over button {
+            background: #4ecca3;
+            color: #232931;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: min(3.5vw, 15px);
+        }
+
+        /* Media Queries untuk Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            #game-container {
+                padding: 10px;
+                width: 80vw;
+            }
+
+            .card {
+                font-size: 18px;
+            }
+
+            #timer, #score {
+                font-size: 15px;
+                padding: 0 5px;
+            }
+
+            #startBtn, #restart {
+                padding: 7px 18px;
+                font-size: 14px;
+                margin: 8px auto;
+            }
+        }
+
+        /* Media Queries untuk Mobile Kecil */
+        @media (max-width: 360px) {
+            body {
+                padding: 8px;
+            }
+
+            #game-container {
+                width: 85vw;
+                padding: 8px;
+            }
+
+            .card {
+                font-size: 16px;
+            }
+
+            #timer, #score {
+                font-size: 14px;
+            }
+
+            #startBtn, #restart {
+                padding: 6px 16px;
+                font-size: 13px;
+            }
+        }
+
+        /* Media Queries untuk Landscape Mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 18px;
+                margin: 5px 0;
+                padding: 0 8px;
+            }
+
+            #game-container {
+                padding: 8px;
+                width: 80vw;
+            }
+
+            #grid {
+                gap: 5px;
+            }
+
+            .card {
+                font-size: 16px;
+            }
+
+            #timer, #score {
+                font-size: 14px;
+                margin: 4px 0;
+                padding: 0 5px;
+            }
+
+            #startBtn, #restart {
+                padding: 6px 15px;
+                font-size: 13px;
+                margin: 4px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Color Match Puzzle</h1>
+    <div id="game-container">
+        <div id="timer">Waktu: 60</div>
+        <div id="score">Skor: 0</div>
+        <div id="grid"></div>
+        <button id="startBtn">Mulai Game</button>
+        <button id="restart" style="display: none;">Mulai Ulang</button>
+    </div>
+
+    <div id="gameOver" class="game-over">
+        <h2>Waktu Habis!</h2>
+        <p>Skor Akhir: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()">Main Lagi</button>
+    </div>
+
+    <script>
+        const colors = ['🔴', '🔵', '🟡', '🟢', '🟣', '🟠', '⚫', '⚪'];
+        let cards = [...colors, ...colors];
+        let score = 0;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let gameActive = false;
+
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restart');
+        const grid = document.getElementById('grid');
+
+        function startGame() {
+            gameActive = true;
+            timeLeft = 60;
+            score = 0;
+            matchedPairs = 0;
+            flippedCards = [];
+            
+            document.getElementById('score').textContent = 'Skor: 0';
+            document.getElementById('timer').textContent = 'Waktu: 60';
+            document.getElementById('gameOver').style.display = 'none';
+            
+            startBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            grid.classList.add('game-started');
+            
+            createBoard();
+            startTimer();
+        }
+
+        function startTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                    return;
+                }
+                timeLeft--;
+                document.getElementById('timer').textContent = `Waktu: ${timeLeft}`;
+            }, 1000);
+        }
+
+        function endGame() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            gameActive = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('timer').textContent = 'Waktu: 0';
+            grid.classList.remove('game-started');
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createBoard() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            cards = shuffle([...cards]);
+            
+            cards.forEach((color, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.color = color;
+                card.dataset.index = index;
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (!gameActive) return;
+            if (flippedCards.length === 2) return;
+            if (this.classList.contains('flipped')) return;
+
+            this.classList.add('flipped');
+            this.textContent = this.dataset.color;
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 1000);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.color === card2.dataset.color) {
+                score += 10;
+                matchedPairs++;
+                document.getElementById('score').textContent = `Skor: ${score}`;
+                
+                if (matchedPairs === colors.length) {
+                    clearInterval(timerInterval);
+                    setTimeout(() => {
+                        alert(`Selamat! Kamu menang dengan skor ${score}!`);
+                        grid.classList.remove('game-started');
+                    }, 500);
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                card1.textContent = '';
+                card2.textContent = '';
+            }
+            flippedCards = [];
+        }
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', restartGame);
+
+        // Inisialisasi game tanpa timer
+        createBoard();
+    </script>
+</body>
+</html> 
