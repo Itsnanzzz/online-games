@@ -40,6 +40,10 @@ app.get('/sliding-puzzle', (req, res) => {
     res.render('games/sliding-puzzle');
 });
 
+app.get('/three-cups', (req, res) => {
+    res.render('games/three-cups');
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 }); 
