@@ -16,10 +16,7 @@ web-game/
         └── 📁images
             └── logo.svg
     └── 📁views
-        └── about.ejs
         └── 📁games
-        └── games.ejs
-            └── puzzle.ejs
         └── index.ejs
     └── .gitignore
     └── app.js
@@ -39,6 +36,7 @@ Koleksi web game sederhana berbasis Node.js dan EJS.
 - **Color Match** (Memory warna)
 - **Tebak Angka** (Guess the Number)
 - **Sliding Puzzle** (Puzzle geser 3x3)
+- **Tebak Bola** (Tebak bola digelas acak)
 
 ## Instalasi
 
