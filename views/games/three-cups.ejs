@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game 3 Gelas & 1 Bola</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #232526, #414345);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #ffd700;
+      text-shadow: 1px 1px 8px #000;
+    }
+    .desc {
+      margin-bottom: 20px;
+      color: #eee;
+      text-align: center;
+      max-width: 350px;
+    }
+    .cups {
+      display: flex;
+      gap: 90px;
+      margin-bottom: 30px;
+      justify-content: center;
+      position: relative;
+      height: 180px;
+    }
+    .cup {
+      width: 80px;
+      height: 120px;
+      background: linear-gradient(180deg, #ffe082 0%, #b8860b 80%, #7c5a13 100%);
+      border-radius: 0 0 40px 40px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 6px #fff3, 0 2px 0 0 #fff8 inset;
+      position: absolute;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      transition: all 0.5s ease;
+      transform-origin: bottom center;
+      overflow: visible;
+    }
+    .cup::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 22px;
+      background: radial-gradient(ellipse at center, #fff8 60%, #ffe08200 100%);
+      border-radius: 50%;
+      z-index: 2;
+      opacity: 0.7;
+    }
+    .cup::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 18px;
+      background: radial-gradient(ellipse at center, #fff2 60%, #b8860b00 100%);
+      border-radius: 50%;
+      z-index: 1;
+      opacity: 0.5;
+    }
+    .cup.cup-0 { left: calc(50% - 120px); }
+    .cup.cup-1 { left: calc(50% - 40px); }
+    .cup.cup-2 { left: calc(50% + 40px); }
+    
+    .cup.lifted {
+      transform: translateY(-80px);
+    }
+    .cup:hover:not(.animating) {
+      transform: translateY(-8px) scale(1.05);
+      background: #ffd700;
+    }
+    .ball {
+      width: 32px;
+      height: 32px;
+      background: #e74c3c;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 8px #000a;
+      border: 3px solid #fff;
+      z-index: 2;
+      transition: opacity 0.3s;
+    }
+    .hidden {
+      opacity: 0;
+    }
+    .result {
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      min-height: 28px;
+      text-align: center;
+    }
+    .btn {
+      background: linear-gradient(90deg, #ffd700, #ff9800);
+      color: #232526;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0003;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #ff9800, #ffd700);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .cup.animating {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tebak Bola</h1>
+  <div class="desc">
+    Perhatikan di mana bola diletakkan. Gelas akan menutup bola dan diacak. Tebak di mana bolanya berada!
+  </div>
+  <div class="result" id="result"></div>
+  <div class="cups" id="cups-container">
+    <div class="cup cup-0" data-index="0" onclick="pickCup(0)">
+      <div class="ball hidden" id="ball-0"></div>
+    </div>
+    <div class="cup cup-1" data-index="1" onclick="pickCup(1)">
+      <div class="ball hidden" id="ball-1"></div>
+    </div>
+    <div class="cup cup-2" data-index="2" onclick="pickCup(2)">
+      <div class="ball hidden" id="ball-2"></div>
+    </div>
+  </div>
+  <button class="btn" id="startBtn" onclick="startGame()">Mulai Game</button>
+  <button class="btn hidden" id="restartBtn" onclick="restartGame()">Main Lagi</button>
+
+  <script>
+    let ballPos = -1;
+    let gameOver = false;
+    let isAnimating = false;
+    const cups = document.querySelectorAll('.cup');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function showInitialBall() {
+      ballPos = Math.floor(Math.random() * 3);
+      document.getElementById('ball-' + ballPos).classList.remove('hidden');
+      await sleep(1500); // Tunjukkan bola selama 1.5 detik
+    }
+
+    async function closeCups() {
+      cups[ballPos].classList.add('lifted');
+      await sleep(1000);
+      cups[ballPos].classList.remove('lifted');
+    }
+
+    function getRandomSwaps() {
+      const swaps = [];
+      const numSwaps = 6; // Jumlah pertukaran
+      
+      for (let i = 0; i < numSwaps; i++) {
+        const cup1 = Math.floor(Math.random() * 3);
+        let cup2 = Math.floor(Math.random() * 3);
+        while (cup2 === cup1) {
+          cup2 = Math.floor(Math.random() * 3);
+        }
+        swaps.push([cup1, cup2]);
+      }
+      return swaps;
+    }
+
+    async function swapCups(cup1, cup2) {
+      const temp = cups[cup1].style.left;
+      cups[cup1].style.left = cups[cup2].style.left;
+      cups[cup2].style.left = temp;
+      
+      // Update posisi bola jika ada di salah satu gelas yang ditukar
+      if (ballPos === cup1) {
+        ballPos = cup2;
+      } else if (ballPos === cup2) {
+        ballPos = cup1;
+      }
+      
+      await sleep(500); // Waktu untuk satu pertukaran
+    }
+
+    async function shuffleCups() {
+      const swaps = getRandomSwaps();
+      for (const [cup1, cup2] of swaps) {
+        await swapCups(cup1, cup2);
+      }
+    }
+
+    async function startGame() {
+      if (isAnimating) return;
+      isAnimating = true;
+      startBtn.disabled = true;
+      cups.forEach(cup => cup.classList.add('animating'));
+      
+      document.getElementById('result').innerText = '';
+      await showInitialBall();
+      // Sembunyikan bola sebelum gelas menutup dan diacak
+      document.getElementById('ball-' + ballPos).classList.add('hidden');
+      await closeCups();
+      await shuffleCups();
+      
+      cups.forEach(cup => cup.classList.remove('animating'));
+      isAnimating = false;
+      gameOver = false;
+    }
+
+    async function pickCup(idx) {
+      if (gameOver || isAnimating) return;
+      
+      if (idx === ballPos) {
+        document.getElementById('ball-' + idx).classList.remove('hidden');
+        document.getElementById('result').innerText = 'Selamat! Kamu benar, bola ada di sini!';
+        document.getElementById('restartBtn').classList.remove('hidden');
+        startBtn.classList.add('hidden');
+        gameOver = true;
+      } else {
+        document.getElementById('result').innerText = 'Salah! Bola ada di gelas lain.';
+        document.getElementById('ball-' + ballPos).classList.remove('hidden');
+        await sleep(1500);
+        restartGame();
+      }
+    }
+
+    async function restartGame() {
+      if (isAnimating) return;
+      document.getElementById('result').innerText = '';
+      document.getElementById('restartBtn').classList.add('hidden');
+      startBtn.classList.remove('hidden');
+      startBtn.disabled = false;
+      
+      for (let i = 0; i < 3; i++) {
+        document.getElementById('ball-' + i).classList.add('hidden');
+      }
+      
+      // Reset posisi gelas
+      cups[0].style.left = 'calc(50% - 120px)';
+      cups[1].style.left = 'calc(50% - 40px)';
+      cups[2].style.left = 'calc(50% + 40px)';
+    }
+
+    // Setup awal
+    restartGame();
+  </script>
+</body>
+</html>
