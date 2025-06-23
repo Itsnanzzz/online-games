@@ -30,34 +30,49 @@ web-game/
     └── vercel.json
 ```
 
-## 🚀 Instalasi
-1. Pastikan Anda memiliki Node.js dan Git terinstal di sistem Anda.
-   - Download Node.js dari [nodejs.org](https://nodejs.org/)
-   - Download Git dari [git-scm.com](https://git-scm.com/)
-   
-2. Clone repositori ini ke lokal Anda.
-   ```bash
-   git clone https://github.com/Itsnanzzz/online-games
-   ```
+# Web Game Collection
 
-3. Buka terminal dan navigasikan ke direktori proyek.
-   ```bash
-   cd online-games
-   ```
+Koleksi web game sederhana berbasis Node.js dan EJS.
 
-4. Jalankan perintah berikut untuk menginstal dependensi:
+## Daftar Game
+- **Overflowing Palette** (Puzzle warna)
+- **Color Match** (Memory warna)
+- **Tebak Angka** (Guess the Number)
+- **Sliding Puzzle** (Puzzle geser 3x3)
+
+## Instalasi
+
+1. **Clone repository & install dependencies**
    ```bash
    npm install
    ```
 
-## ▶️ Menjalankan Aplikasi
-Setelah menginstal dependensi, Anda dapat menjalankan aplikasi dengan perintah berikut:
-```bash
-node app.js
-```
-Aplikasi akan berjalan di `http://localhost:3000`.
+## Menjalankan Aplikasi
 
-``
+- Jalankan server:
+  ```bash
+  npm start
+  ```
+- Akses aplikasi di [http://localhost:3000](http://localhost:3000)
+
+## Mode Development (Auto-reload)
+
+Agar server otomatis restart saat ada perubahan file, gunakan [nodemon](https://www.npmjs.com/package/nodemon):
+
+- Jalankan dengan nodemon (tanpa install global):
+  ```bash
+  npx nodemon app.js
+  ```
+- Atau install global:
+  ```bash
+  npm install -g nodemon
+  nodemon app.js
+  ```
+
+## Catatan
+- Semua game dapat diakses melalui route masing-masing di folder `views/games/`.
+- Untuk menambah game baru, cukup tambahkan file `.ejs` di folder tersebut dan update routing di `app.js`.
+
 ## 🎯 Fitur
 - **🏠 Halaman Beranda**: Menampilkan pesan selamat datang.
 - **🎮 Halaman Games**: Menampilkan kumpulan game dengan tampilan card.
