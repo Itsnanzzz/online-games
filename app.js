@@ -32,6 +32,14 @@ app.get('/clm', (req, res) => {
     res.render('games/color-match');
 });
 
+app.get('/guess-number', (req, res) => {
+    res.render('games/guess-number');
+});
+
+app.get('/sliding-puzzle', (req, res) => {
+    res.render('games/sliding-puzzle');
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 }); 
