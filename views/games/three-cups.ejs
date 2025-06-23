@@ -46,7 +46,7 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      transition: all 0.5s ease;
+      transition: all 0.25s ease-in-out;
       transform-origin: bottom center;
       overflow: visible;
     }
@@ -81,7 +81,7 @@
     .cup.cup-0 { left: calc(50% - 120px); }
     .cup.cup-1 { left: calc(50% - 40px); }
     .cup.cup-2 { left: calc(50% + 40px); }
-    
+
     .cup.lifted {
       transform: translateY(-80px);
     }
@@ -172,43 +172,43 @@
     async function showInitialBall() {
       ballPos = Math.floor(Math.random() * 3);
       document.getElementById('ball-' + ballPos).classList.remove('hidden');
-      await sleep(1500); // Tunjukkan bola selama 1.5 detik
+      await sleep(1500);
     }
 
     async function closeCups() {
       cups[ballPos].classList.add('lifted');
-      await sleep(1000);
+      await sleep(800);
       cups[ballPos].classList.remove('lifted');
     }
 
     function getRandomSwaps() {
       const swaps = [];
-      const numSwaps = 6; // Jumlah pertukaran
-      
+      const numSwaps = 12 + Math.floor(Math.random() * 6);
       for (let i = 0; i < numSwaps; i++) {
-        const cup1 = Math.floor(Math.random() * 3);
-        let cup2 = Math.floor(Math.random() * 3);
-        while (cup2 === cup1) {
-          cup2 = Math.floor(Math.random() * 3);
+        let a = Math.floor(Math.random() * 3);
+        let b = Math.floor(Math.random() * 3);
+        while (a === b) {
+          b = Math.floor(Math.random() * 3);
         }
-        swaps.push([cup1, cup2]);
+        swaps.push([a, b]);
       }
       return swaps;
     }
 
     async function swapCups(cup1, cup2) {
-      const temp = cups[cup1].style.left;
-      cups[cup1].style.left = cups[cup2].style.left;
-      cups[cup2].style.left = temp;
-      
-      // Update posisi bola jika ada di salah satu gelas yang ditukar
+      const cupElem1 = cups[cup1];
+      const cupElem2 = cups[cup2];
+      const tempLeft = cupElem1.style.left;
+      cupElem1.style.left = cupElem2.style.left;
+      cupElem2.style.left = tempLeft;
+
       if (ballPos === cup1) {
         ballPos = cup2;
       } else if (ballPos === cup2) {
         ballPos = cup1;
       }
-      
-      await sleep(500); // Waktu untuk satu pertukaran
+
+      await sleep(200);
     }
 
     async function shuffleCups() {
@@ -226,11 +226,10 @@
       
       document.getElementById('result').innerText = '';
       await showInitialBall();
-      // Sembunyikan bola sebelum gelas menutup dan diacak
       document.getElementById('ball-' + ballPos).classList.add('hidden');
       await closeCups();
       await shuffleCups();
-      
+
       cups.forEach(cup => cup.classList.remove('animating'));
       isAnimating = false;
       gameOver = false;
@@ -259,18 +258,16 @@
       document.getElementById('restartBtn').classList.add('hidden');
       startBtn.classList.remove('hidden');
       startBtn.disabled = false;
-      
+
       for (let i = 0; i < 3; i++) {
         document.getElementById('ball-' + i).classList.add('hidden');
       }
-      
-      // Reset posisi gelas
+
       cups[0].style.left = 'calc(50% - 120px)';
       cups[1].style.left = 'calc(50% - 40px)';
       cups[2].style.left = 'calc(50% + 40px)';
     }
 
-    // Setup awal
     restartGame();
   </script>
 </body>
