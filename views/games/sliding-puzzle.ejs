@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle 3x3</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #232526, #414345);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        h1 {
+            color: #ffd700;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        #puzzle-container {
+            background: rgba(255,255,255,0.08);
+            padding: 18px 12px;
+            border-radius: 12px;
+            box-shadow: 0 0 16px #0004;
+            width: min(95vw, 340px);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            width: 270px;
+            height: 270px;
+            margin: 18px 0 10px 0;
+        }
+        .tile {
+            background: #ffd700;
+            color: #232526;
+            font-size: 2.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #0002;
+            user-select: none;
+        }
+        .tile.empty {
+            background: #232526;
+            box-shadow: none;
+            cursor: default;
+        }
+        #restartBtn {
+            background: #ffd700;
+            color: #232526;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        #restartBtn:hover {
+            background: #ffe066;
+        }
+        #message {
+            min-height: 28px;
+            font-size: 1.1rem;
+            color: #ffd700;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        @media (max-width: 400px) {
+            #puzzle-grid {
+                width: 90vw;
+                height: 90vw;
+                max-width: 260px;
+                max-height: 260px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            #puzzle-container {
+                padding: 8px 2vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="helpBtn" title="Petunjuk" style="position:fixed;top:16px;right:16px;z-index:1001;background:none;border:none;font-size:2rem;color:#ffd700;cursor:pointer;">?</button>
+    <h1>Sliding Puzzle 3x3</h1>
+    <div id="puzzle-container">
+        <div id="message"></div>
+        <div id="time-info" style="min-height:24px;font-size:1.05rem;color:#ffd700;text-align:center;"></div>
+        <div id="step-info" style="min-height:24px;font-size:1.05rem;color:#ffd700;text-align:center;"></div>
+        <div id="puzzle-grid"></div>
+        <button id="restartBtn">Acak Ulang</button>
+    </div>
+    <div id="helpPopup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#232526;padding:22px 18px;border-radius:12px;box-shadow:0 0 24px #000a;z-index:1100;max-width:90vw;width:320px;color:#fff;text-align:left;">
+        <h2 style="color:#ffd700;margin-top:0;margin-bottom:10px;font-size:1.2rem;">Cara Main Sliding Puzzle</h2>
+        <ul style="margin:0 0 10px 18px;padding:0;font-size:1rem;">
+            <li>Puzzle berisi angka 1 sampai 8 dan satu kotak kosong.</li>
+            <li>Klik angka yang berada di samping kotak kosong untuk menggesernya.</li>
+            <li>Susun angka hingga urut dari 1 sampai 8, kotak kosong di pojok kanan bawah.</li>
+            <li>angka nomor 1 harus berada di pojok kiri atas.</li>
+            <li>Jika urutan sudah benar, kamu menang!</li>
+        </ul>
+        <button onclick="closeHelp()" style="background:#ffd700;color:#232526;border:none;padding:7px 18px;border-radius:7px;cursor:pointer;font-size:1rem;">Tutup</button>
+    </div>
+    <script>
+        let tiles = [];
+        const gridSize = 3;
+        const puzzleGrid = document.getElementById('puzzle-grid');
+        const message = document.getElementById('message');
+        const restartBtn = document.getElementById('restartBtn');
+        const helpBtn = document.getElementById('helpBtn');
+        const helpPopup = document.getElementById('helpPopup');
+        const timeInfo = document.getElementById('time-info');
+        const stepInfo = document.getElementById('step-info');
+        let timerInterval = null;
+        let startTime = null;
+        let elapsed = 0;
+        let steps = 0;
+
+        function shuffle(array) {
+            // Fisher-Yates shuffle
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function isSolvable(arr) {
+            // Untuk puzzle 3x3, hitung inversi
+            let inv = 0;
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = i + 1; j < arr.length; j++) {
+                    if (arr[i] && arr[j] && arr[i] > arr[j]) inv++;
+                }
+            }
+            return inv % 2 === 0;
+        }
+
+        function generatePuzzle() {
+            let arr;
+            do {
+                arr = shuffle([1,2,3,4,5,6,7,8,null]);
+            } while (!isSolvable(arr));
+            return arr;
+        }
+
+        function renderPuzzle() {
+            puzzleGrid.innerHTML = '';
+            tiles.forEach((val, idx) => {
+                const tile = document.createElement('div');
+                tile.className = 'tile' + (val === null ? ' empty' : '');
+                tile.textContent = val === null ? '' : val;
+                tile.addEventListener('click', () => moveTile(idx));
+                puzzleGrid.appendChild(tile);
+            });
+        }
+
+        function moveTile(idx) {
+            if (tiles[idx] === null) return;
+            const emptyIdx = tiles.indexOf(null);
+            const canMove = [
+                emptyIdx - 1, emptyIdx + 1,
+                emptyIdx - gridSize, emptyIdx + gridSize
+            ].includes(idx) &&
+            // Cek agar tidak wrap antar baris
+            (Math.floor(idx / gridSize) === Math.floor(emptyIdx / gridSize) ||
+             idx % gridSize === emptyIdx % gridSize);
+            if (canMove) {
+                [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+                steps++;
+                renderPuzzle();
+                checkWin();
+            }
+        }
+
+        function formatTime(ms) {
+            const totalSec = Math.floor(ms / 1000);
+            const min = Math.floor(totalSec / 60);
+            const sec = totalSec % 60;
+            return `${min}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        function checkWin() {
+            const solved = tiles.slice(0,8).every((v,i) => v === i+1) && tiles[8] === null;
+            if (solved) {
+                message.textContent = 'Selamat! Puzzle selesai! 🎉';
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                elapsed = Date.now() - startTime;
+                timeInfo.textContent = `Waktu pengerjaan: ${formatTime(elapsed)}`;
+                stepInfo.textContent = `Jumlah langkah: ${steps}`;
+            } else {
+                message.textContent = '';
+                timeInfo.textContent = '';
+                stepInfo.textContent = '';
+            }
+        }
+
+        function restartPuzzle() {
+            tiles = generatePuzzle();
+            renderPuzzle();
+            message.textContent = '';
+            timeInfo.textContent = '';
+            stepInfo.textContent = '';
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                // hanya update jika puzzle belum selesai
+                if (!tiles.slice(0,8).every((v,i) => v === i+1) || tiles[8] !== null) {
+                    elapsed = Date.now() - startTime;
+                }
+            }, 1000);
+            steps = 0;
+        }
+
+        restartBtn.addEventListener('click', restartPuzzle);
+        helpBtn.addEventListener('click', () => { helpPopup.style.display = 'block'; });
+        function closeHelp() { helpPopup.style.display = 'none'; }
+        // Inisialisasi
+        restartPuzzle();
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Angka</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #232526, #414345);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        h1 {
+            color: #ffd700;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        #game-container {
+            background: rgba(255,255,255,0.08);
+            padding: 24px 18px;
+            border-radius: 12px;
+            box-shadow: 0 0 16px #0004;
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            width: 100%;
+            justify-content: center;
+        }
+        input[type="number"] {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.15rem;
+            width: 100px;
+            text-align: center;
+            box-shadow: 0 2px 6px #0002;
+        }
+        button {
+            background: #ffd700;
+            color: #232526;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 22px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #ffe066;
+        }
+        #feedback {
+            margin: 16px 0 10px 0;
+            font-size: 1.15rem;
+            min-height: 28px;
+            text-align: center;
+        }
+        #attempts {
+            font-size: 1rem;
+            color: #ffd700;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 12px 0;
+            }
+            #game-container {
+                padding: 14px 5vw;
+                width: 100%;
+                max-width: 380px;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            h1 {
+                font-size: 1.15rem;
+                margin-top: 18px;
+            }
+            #input-area {
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            input[type="number"] {
+                width: 100%;
+                font-size: 1.05rem;
+                padding: 12px 8px;
+            }
+            button {
+                width: 100%;
+                font-size: 1.05rem;
+                padding: 12px 0;
+            }
+            #feedback {
+                font-size: 1.05rem;
+                margin: 12px 0 8px 0;
+            }
+            #attempts {
+                font-size: 0.98rem;
+                margin-bottom: 10px;
+            }
+        }
+        @media (max-width: 400px) {
+            #game-container {
+                padding: 8px 4vw;
+                max-width: 98vw;
+            }
+            h1 {
+                font-size: 0.98rem;
+            }
+            #feedback {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Tebak Angka (1-100)</h1>
+    <div id="game-container">
+        <div id="attempts">Percobaan: 0</div>
+        <div id="input-area">
+            <input type="number" id="guessInput" min="1" max="100" placeholder="Tebak..." />
+            <button id="guessBtn">Tebak</button>
+        </div>
+        <div id="feedback"></div>
+        <button id="restartBtn" style="display:none; margin-top:10px;">Main Lagi</button>
+    </div>
+    <script>
+        let target = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        let finished = false;
+
+        const guessInput = document.getElementById('guessInput');
+        const guessBtn = document.getElementById('guessBtn');
+        const feedback = document.getElementById('feedback');
+        const attemptsEl = document.getElementById('attempts');
+        const restartBtn = document.getElementById('restartBtn');
+
+        function updateAttempts() {
+            attemptsEl.textContent = `Percobaan: ${attempts}`;
+        }
+
+        function checkGuess() {
+            if (finished) return;
+            const guess = parseInt(guessInput.value);
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                feedback.textContent = 'Masukkan angka 1-100!';
+                return;
+            }
+            attempts++;
+            updateAttempts();
+            if (guess < target) {
+                feedback.textContent = 'Terlalu kecil!';
+            } else if (guess > target) {
+                feedback.textContent = 'Terlalu besar!';
+            } else {
+                feedback.textContent = `Benar! Angkanya adalah ${target}. 🎉`;
+                finished = true;
+                guessBtn.disabled = true;
+                guessInput.disabled = true;
+                restartBtn.style.display = 'block';
+            }
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function restartGame() {
+            target = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            finished = false;
+            updateAttempts();
+            feedback.textContent = '';
+            guessBtn.disabled = false;
+            guessInput.disabled = false;
+            guessInput.value = '';
+            restartBtn.style.display = 'none';
+            guessInput.focus();
+        }
+
+        guessBtn.addEventListener('click', checkGuess);
+        guessInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') checkGuess();
+        });
+        restartBtn.addEventListener('click', restartGame);
+        updateAttempts();
+        guessInput.focus();
+    </script>
+</body>
+</html> 
