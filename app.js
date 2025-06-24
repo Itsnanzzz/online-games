@@ -40,7 +40,7 @@ app.get('/sliding-puzzle', (req, res) => {
     res.render('games/sliding-puzzle');
 });
 
-app.get('/three-cups', (req, res) => {
+app.get('/tbl', (req, res) => {
     res.render('games/three-cups');
 });
 
