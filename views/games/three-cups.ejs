@@ -1,117 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game 3 Gelas & 1 Bola</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game 4 Gelas & 1 Bola</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #232526, #414345);
       color: #fff;
       min-height: 100vh;
+      margin: 0;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 0;
     }
+
     h1 {
       margin-bottom: 10px;
       color: #ffd700;
       text-shadow: 1px 1px 8px #000;
+      text-align: center;
     }
+
     .desc {
       margin-bottom: 20px;
       color: #eee;
       text-align: center;
       max-width: 350px;
     }
+
     .cups {
-      display: flex;
-      gap: 90px;
-      margin-bottom: 30px;
-      justify-content: center;
       position: relative;
+      width: 100%;
+      max-width: 400px;
       height: 180px;
+      margin-bottom: 30px;
     }
+
     .cup {
       width: 80px;
       height: 120px;
       background: linear-gradient(180deg, #ffe082 0%, #b8860b 80%, #7c5a13 100%);
       border-radius: 0 0 40px 40px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 6px #fff3, 0 2px 0 0 #fff8 inset;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 6px #fff3, 0 2px 0 0 #fff8 inset;
       position: absolute;
       cursor: pointer;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      transition: all 0.25s ease-in-out;
+      transition: left 0.3s ease-in-out, transform 0.25s ease-in-out;
       transform-origin: bottom center;
-      overflow: visible;
     }
-    .cup::before {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 22px;
-      background: radial-gradient(ellipse at center, #fff8 60%, #ffe08200 100%);
-      border-radius: 50%;
-      z-index: 2;
-      opacity: 0.7;
-    }
+
+    .cup::before,
     .cup::after {
       content: '';
-      display: block;
       position: absolute;
-      bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
-      height: 18px;
-      background: radial-gradient(ellipse at center, #fff2 60%, #b8860b00 100%);
       border-radius: 50%;
-      z-index: 1;
+      z-index: 2;
+    }
+
+    .cup::before {
+      top: 0;
+      width: 70%;
+      height: 20px;
+      background: radial-gradient(ellipse at center, #fff8 60%, #ffe08200 100%);
+      opacity: 0.7;
+    }
+
+    .cup::after {
+      bottom: 0;
+      width: 60%;
+      height: 16px;
+      background: radial-gradient(ellipse at center, #fff2 60%, #b8860b00 100%);
       opacity: 0.5;
     }
-    .cup.cup-0 { left: calc(50% - 120px); }
-    .cup.cup-1 { left: calc(50% - 40px); }
-    .cup.cup-2 { left: calc(50% + 40px); }
 
     .cup.lifted {
       transform: translateY(-80px);
     }
+
     .cup:hover:not(.animating) {
       transform: translateY(-8px) scale(1.05);
       background: #ffd700;
     }
+
     .ball {
       width: 32px;
       height: 32px;
-      background: #e74c3c;
+      background: radial-gradient(circle at 30% 30%, #ff7675 60%, #d63031 90%, #c0392b 100%);
       border-radius: 50%;
       position: absolute;
       left: 50%;
       bottom: 10px;
       transform: translateX(-50%);
-      box-shadow: 0 2px 8px #000a;
+      box-shadow: 0 2px 8px #000a, 0 0 16px 4px #ff7675aa;
       border: 3px solid #fff;
-      z-index: 2;
+      z-index: 1;
       transition: opacity 0.3s;
+      animation: ball-pulse 1.2s infinite alternate;
     }
+
+    .ball::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      width: 10px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      filter: blur(1px);
+      pointer-events: none;
+    }
+
+    @keyframes ball-pulse {
+      0% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 2px 8px #000a, 0 0 16px 4px #ff7675aa;
+      }
+      100% {
+        transform: translateX(-50%) scale(1.12);
+        box-shadow: 0 4px 16px #000a, 0 0 32px 8px #fdcb6e88;
+      }
+    }
+
     .hidden {
       opacity: 0;
     }
+
     .result {
       font-size: 1.2rem;
       margin-bottom: 18px;
       min-height: 28px;
       text-align: center;
     }
+
     .btn {
       background: linear-gradient(90deg, #ffd700, #ff9800);
       color: #232526;
@@ -122,18 +151,53 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 2px 8px #0003;
-      margin-top: 10px;
+      margin-top: 5px;
       transition: background 0.2s;
     }
+
     .btn:hover {
       background: linear-gradient(90deg, #ff9800, #ffd700);
     }
+
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+
     .cup.animating {
       pointer-events: none;
+    }
+
+    /* === MOBILE === */
+    @media (max-width: 480px) {
+      .cups {
+        max-width: 280px;
+        height: 140px;
+        padding-right: 30px;
+      }
+
+      .cup {
+        width: 50px;
+        height: 80px;
+      }
+
+      .cup-0 { left: 0vw; }
+      .cup-1 { left: 22vw; }
+      .cup-2 { left: 44vw; }
+      .cup-3 { left: 66vw; }
+
+      .ball {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    /* === DESKTOP === */
+    @media (min-width: 481px) {
+      .cup-0 { left: 0px; }
+      .cup-1 { left: 100px; }
+      .cup-2 { left: 200px; }
+      .cup-3 { left: 300px; }
     }
   </style>
 </head>
@@ -153,6 +217,9 @@
     <div class="cup cup-2" data-index="2" onclick="pickCup(2)">
       <div class="ball hidden" id="ball-2"></div>
     </div>
+    <div class="cup cup-3" data-index="3" onclick="pickCup(3)">
+      <div class="ball hidden" id="ball-3"></div>
+    </div>
   </div>
   <button class="btn" id="startBtn" onclick="startGame()">Mulai Game</button>
   <button class="btn hidden" id="restartBtn" onclick="restartGame()">Main Lagi</button>
@@ -161,16 +228,17 @@
     let ballPos = -1;
     let gameOver = false;
     let isAnimating = false;
-    const cups = document.querySelectorAll('.cup');
     const startBtn = document.getElementById('startBtn');
     const restartBtn = document.getElementById('restartBtn');
-    
+    const resultEl = document.getElementById('result');
+    const cups = Array.from(document.querySelectorAll('.cup'));
+
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async function showInitialBall() {
-      ballPos = Math.floor(Math.random() * 3);
+      ballPos = Math.floor(Math.random() * 4);
       document.getElementById('ball-' + ballPos).classList.remove('hidden');
       await sleep(1500);
     }
@@ -183,38 +251,33 @@
 
     function getRandomSwaps() {
       const swaps = [];
-      const numSwaps = 12 + Math.floor(Math.random() * 6);
+      const numSwaps = 10 + Math.floor(Math.random() * 6);
       for (let i = 0; i < numSwaps; i++) {
-        let a = Math.floor(Math.random() * 3);
-        let b = Math.floor(Math.random() * 3);
-        while (a === b) {
-          b = Math.floor(Math.random() * 3);
-        }
+        let a = Math.floor(Math.random() * 4);
+        let b = Math.floor(Math.random() * 4);
+        while (a === b) b = Math.floor(Math.random() * 4);
         swaps.push([a, b]);
       }
       return swaps;
     }
 
-    async function swapCups(cup1, cup2) {
-      const cupElem1 = cups[cup1];
-      const cupElem2 = cups[cup2];
-      const tempLeft = cupElem1.style.left;
-      cupElem1.style.left = cupElem2.style.left;
-      cupElem2.style.left = tempLeft;
+    async function swapCups(i, j) {
+      const tempLeft = cups[i].style.left;
+      cups[i].style.left = cups[j].style.left;
+      cups[j].style.left = tempLeft;
 
-      if (ballPos === cup1) {
-        ballPos = cup2;
-      } else if (ballPos === cup2) {
-        ballPos = cup1;
-      }
+      [cups[i], cups[j]] = [cups[j], cups[i]];
 
-      await sleep(200);
+      if (ballPos === i) ballPos = j;
+      else if (ballPos === j) ballPos = i;
+
+      await sleep(300);
     }
 
     async function shuffleCups() {
       const swaps = getRandomSwaps();
-      for (const [cup1, cup2] of swaps) {
-        await swapCups(cup1, cup2);
+      for (const [a, b] of swaps) {
+        await swapCups(a, b);
       }
     }
 
@@ -222,9 +285,9 @@
       if (isAnimating) return;
       isAnimating = true;
       startBtn.disabled = true;
+      resultEl.innerText = '';
       cups.forEach(cup => cup.classList.add('animating'));
-      
-      document.getElementById('result').innerText = '';
+
       await showInitialBall();
       document.getElementById('ball-' + ballPos).classList.add('hidden');
       await closeCups();
@@ -235,37 +298,45 @@
       gameOver = false;
     }
 
-    async function pickCup(idx) {
+    async function pickCup(index) {
       if (gameOver || isAnimating) return;
-      
-      if (idx === ballPos) {
-        document.getElementById('ball-' + idx).classList.remove('hidden');
-        document.getElementById('result').innerText = 'Selamat! Kamu benar, bola ada di sini!';
-        document.getElementById('restartBtn').classList.remove('hidden');
+
+      if (index === ballPos) {
+        document.getElementById('ball-' + index).classList.remove('hidden');
+        resultEl.innerText = 'Selamat! Kamu benar, bola ada di sini!';
+        restartBtn.classList.remove('hidden');
         startBtn.classList.add('hidden');
         gameOver = true;
       } else {
-        document.getElementById('result').innerText = 'Salah! Bola ada di gelas lain.';
+        resultEl.innerText = 'Salah! Bola ada di gelas lain.';
         document.getElementById('ball-' + ballPos).classList.remove('hidden');
         await sleep(1500);
         restartGame();
       }
     }
 
-    async function restartGame() {
+    function restartGame() {
       if (isAnimating) return;
-      document.getElementById('result').innerText = '';
-      document.getElementById('restartBtn').classList.add('hidden');
+      resultEl.innerText = '';
+      restartBtn.classList.add('hidden');
       startBtn.classList.remove('hidden');
       startBtn.disabled = false;
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         document.getElementById('ball-' + i).classList.add('hidden');
       }
 
-      cups[0].style.left = 'calc(50% - 120px)';
-      cups[1].style.left = 'calc(50% - 40px)';
-      cups[2].style.left = 'calc(50% + 40px)';
+      if (window.innerWidth <= 480) {
+        cups[0].style.left = '0vw';
+        cups[1].style.left = '22vw';
+        cups[2].style.left = '44vw';
+        cups[3].style.left = '66vw';
+      } else {
+        cups[0].style.left = '0px';
+        cups[1].style.left = '100px';
+        cups[2].style.left = '200px';
+        cups[3].style.left = '300px';
+      }
     }
 
     restartGame();
