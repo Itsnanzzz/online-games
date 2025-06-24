@@ -12,9 +12,7 @@ Proyek ini adalah aplikasi web berbasis Express.js yang mendukung banyak halaman
 web-game/
 └── 📁public
         └── 📁css
-            └── style.css
         └── 📁images
-            └── logo.svg
     └── 📁views
         └── 📁games
         └── index.ejs
