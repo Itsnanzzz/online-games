@@ -44,6 +44,14 @@ app.get('/tbl', (req, res) => {
     res.render('games/three-cups');
 });
 
+app.get('/chess', (req, res) => {
+    res.render('games/chess');
+});
+
+app.get('/snake', (req, res) => {
+    res.render('games/snake');
+});
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 }); 

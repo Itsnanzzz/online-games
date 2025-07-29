@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-gray-900 text-white;
+}
+
+canvas {
+    @apply border border-gray-700 bg-gray-800;
+}
+
+button {
+    @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors;
+}
